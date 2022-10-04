@@ -1,0 +1,45 @@
+---
+- name: create all users
+  hosts: all
+  become: yes
+  vars_files:
+    - secret.yml
+    - user_list.yml
+
+  tasks:
+
+  - name: create webservers users
+    user:
+      name: "{{ item.username }}"
+      uid: "{{ item.uid }}"
+      groups: wheel
+      password: "{{ user_password | password_hash('sha512') }}"
+      update_password: on_create
+      shell: /bin/bash
+      state: present
+    loop: "{{ users }}"
+    when:
+      - ansible_fqdn in groups['webservers']
+      - item.uid < 2000
+
+  - name: create database users
+    user:
+      name: "{{ item.username }}"
+      uid: "{{ item.uid }}"
+      groups: wheel
+      password: "{{database_password | password_hash('sha512') }}"
+      update_password: on_create
+      shell: /bin/bash
+      state: present
+    loop: "{{ users }}"
+    when:
+      - ansible_fqdn in groups['database']
+      - item.uid > 2000
+
+  - name: set authorized key for users
+    authorized_key:
+      user: "{{ item.username }}"
+      state: present
+      key: "{{ lookup('file', '/home/automation/.ssh/id_rsa.pub') }}"
+    loop: "{{ users }}"
+    ignore_errors: true

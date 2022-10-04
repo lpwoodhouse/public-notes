@@ -1,0 +1,23 @@
+---
+- name: install packages task
+  hosts: dev,test,prod
+  vars:
+    packages:
+      - perl
+      - php
+
+  tasks:
+
+  - name: install packages
+    yum:
+      name: "{{ packages | join(',') }}"
+      state: present
+
+  - name: install addition packages on prod servers
+    yum:
+      name: "{{ item }}"
+      state: latest
+    loop:
+      - "*"
+      - "@Virtualization Host"
+    when: "'prod' in group_names"

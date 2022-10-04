@@ -1,0 +1,12 @@
+---
+- name: set default target
+  hosts: webservers
+  become: true
+
+  tasks:
+
+  - name: create link to multi-user.target
+    file:
+      dest: /etc/systemd/system/default.target
+      src: /usr/lib/systemd/system/multi-user.target
+      state: link

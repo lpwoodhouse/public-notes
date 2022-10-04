@@ -1,0 +1,20 @@
+---
+- name: install mysql package
+  package:
+    name: mysql-community-server
+    state: present
+  changed_when: true
+  notify: enable mysql
+
+- name: config firewall
+  firewalld:
+    port: 3306/tcp
+    state: enabled
+    permanent: true
+    immediate: true
+
+- name: copy my.cnf to client
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    backup: true

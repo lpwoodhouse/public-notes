@@ -1,0 +1,14 @@
+---
+- name: configure motd
+  hosts: all
+  gather_facts: true
+
+  tasks:
+
+  - name: copy template to motd
+    template:
+      src: templates/motd.j2
+      dest: /etc/motd
+      owner: root
+      group: root
+      mode: 0644

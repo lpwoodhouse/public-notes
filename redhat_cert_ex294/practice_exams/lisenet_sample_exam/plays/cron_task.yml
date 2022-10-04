@@ -1,0 +1,14 @@
+---
+- name: scheduled tasks
+  hosts: proxy
+  become: true
+
+  tasks:
+
+  - name: create cron task
+    cron:
+      name: "append time"
+      hour: "*/1"
+      minute: "0"
+      job: "/bin/date >> /var/log/time.log"
+      user: root

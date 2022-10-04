@@ -1,0 +1,21 @@
+---
+- name: config sshd
+  hosts: all
+  become: true
+
+  tasks:
+
+  - name: configure sshd_config
+    blockinfile:
+      path: /etc/ssh/sshd_config
+      marker: "#<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+      insertbefore: BOF
+      block: |
+        Banner /etc/motd
+        X11Forwarding no
+        MaxAuthTries 3
+
+  - name: restart sshd service
+    service:
+      name: sshd
+      state: restarted

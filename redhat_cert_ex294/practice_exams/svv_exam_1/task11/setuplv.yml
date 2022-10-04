@@ -1,0 +1,32 @@
+---
+- name: set up logical volumes on hosts
+  hosts: all
+
+  vars:
+    lvname: lvdata
+    vgname: vgdata
+    lvsize: 2000
+
+  tasks:
+
+  - name: test if vg exists
+    block:
+      - debug:
+          msg: vgdata does not exist
+      - meta: end_host
+    when: ansible_facts['lvm']['vgs'][vgname] is not defined
+
+  - name: test if sufficient size
+    block:
+      - debug:
+          msg: insufficient size
+      - meta: end_host
+    when:
+      - ansible_facts['lvm']['vgs'][vgname] is defined
+      - lvsize/1000|float > ansible_facts['lvm']['vgs'][vgname]['free_g']|float
+
+  - name: create logical volume
+    lvol:
+      lv: "{{ lvname }}"
+      vg: "{{ vgname }}"
+      size: "{{ lvsize }}"

@@ -1,0 +1,9 @@
+---
+- name: get database vars
+  include_vars: /home/automation/plays/secret.yml
+
+- name: configure volume
+  include_tasks: config_vol.yml
+
+- name: configure mysql
+  include_tasks: config_mysql.yml

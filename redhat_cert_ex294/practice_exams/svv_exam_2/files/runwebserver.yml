@@ -1,0 +1,56 @@
+---
+- name: configure webserver
+  hosts: all
+  vars:
+    webowner: Anna
+
+  tasks:
+
+  - name: install httpd
+    yum:
+      name: httpd
+      state: present
+
+  - name: enable httpd
+    service:
+      name: httpd
+      state: started
+      enabled: true
+
+  - name: config firewall to allow http
+    firewalld:
+      service: http
+      state: enabled
+      permanent: true
+      immediate: true
+
+  - name: config prod webservers
+    block:
+
+    - name: create webcontent dir
+      file:
+        path: /webcontent
+        state: directory
+
+    - name: copy index.html
+      template:
+        src: index.html.j2
+        dest: /webcontent/index.html
+        setype: httpd_sys_content_t
+      changed_when: true
+      notify: restart httpd
+
+    - name: create symlink
+      file:
+        dest: /var/www/html/index.html
+        src: /webcontent/index.html
+        state: link
+
+    when: "'prod' in group_names"
+
+  handlers:
+
+  - name: restart httpd
+    service:
+      name: httpd
+      state: restarted

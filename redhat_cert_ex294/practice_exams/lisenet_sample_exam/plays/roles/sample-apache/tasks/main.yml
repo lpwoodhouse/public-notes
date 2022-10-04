@@ -1,0 +1,36 @@
+---
+# tasks file for sample-apache
+
+- name: install packages
+  package:
+    name: "{{ packages | join(',') }}"
+    state: present
+
+- name: enable httpd
+  service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: configure firewall
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+   - "80/tcp"
+   - "443/tcp"
+
+- name: configure SELinux boolean
+  seboolean:
+    name: httpd_can_network_connect
+    state: on
+    persistent: yes
+
+- name: copy index.html
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  change_when: true
+  notify: restart httpd

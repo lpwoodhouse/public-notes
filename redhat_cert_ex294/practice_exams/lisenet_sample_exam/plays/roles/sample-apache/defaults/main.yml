@@ -1,0 +1,6 @@
+---
+# defaults file for sample-apache
+packages:
+  - httpd
+  - mod_ssl
+  - php

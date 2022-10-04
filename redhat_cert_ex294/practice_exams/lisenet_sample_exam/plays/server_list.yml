@@ -1,0 +1,16 @@
+---
+- name: export list of servers to file
+  hosts: all
+  become: true
+
+  tasks:
+
+  - name:
+    template:
+      src: server_list.j2
+      dest: /etc/server_list.txt
+      owner: automation
+      group: automation
+      mode: 0600
+      setype: net_conf_t
+    when: "'database' in group_names"

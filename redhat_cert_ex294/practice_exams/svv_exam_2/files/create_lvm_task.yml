@@ -1,0 +1,39 @@
+---
+- name: configure logical volumes
+  hosts: all
+
+  tasks:
+
+  - name: create partition
+    parted:
+      dev: /dev/sdb
+      number: 1
+      state: present
+      part_end: 2GiB
+      flags: [ lvm ]
+    register: result
+    when: "'sdb' in ansible_devices"
+    ignore_errors: true
+
+  - name: create volume group
+    lvg:
+      vg: vgdata
+      pvs: /dev/sdb1
+    ignore_errors: true
+
+  - name: create logical volume
+    lvol:
+      vg: vgdata
+      lv: lvdata
+      size: 100%FREE
+    ignore_errors: true
+
+  - name: fail message
+    fail:
+      msg: vgprod does not exist
+    when: "'exist' in result.err"
+
+  - name: fail message insufficient
+    fail:
+      msg: insufficient disk space available
+    when: "'insufficient' in result.err"

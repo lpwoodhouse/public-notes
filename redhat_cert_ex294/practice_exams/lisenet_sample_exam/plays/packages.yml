@@ -1,0 +1,11 @@
+---
+- name: install packages
+  hosts: all
+  become: true
+
+  tasks:
+
+  - name: install group packages
+    package:
+      name: "{{ packages | join(',') }}"
+    when: ('proxy' in group_names) or ('database' in group_names)

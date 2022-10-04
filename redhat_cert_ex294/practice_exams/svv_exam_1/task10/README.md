@@ -1,0 +1,3 @@
+- This task uses an encrypted vault file
+- Ensure to include 'ask_vault_pass = true' in ansible.cfg
+- The vault password is: password

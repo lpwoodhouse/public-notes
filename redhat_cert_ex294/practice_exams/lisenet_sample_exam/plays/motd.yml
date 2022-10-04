@@ -1,0 +1,21 @@
+---
+- name: config motd
+  hosts: all
+  become: true
+  vars:
+    hostsgp:
+      - name: proxy
+        msg: HAProxy
+      - name: webservers
+        msg: Apache
+      - name: database
+        msg: MySQL
+
+  tasks:
+
+    - name: configure motd message
+      copy:
+        dest: /etc/motd
+        content: "Welcome to {{ item.msg }} server"
+      loop: "{{ hostsgp }}"
+      when: item.name in group_names

@@ -1,0 +1,9 @@
+______________________________________
+
+Welcome to {{ ansible_fqdn }}
+
+- System memory: {{ ansible_memory_mb.real.total }} MB
+- Processor count: {{ ansible_processor_count }}
+- Primary disk size: {{ ansible_devices.sda.size  }}
+- Secondary disk size: {{ (ansible_devices.sdb.size) if ( 'sdb' in ansible_devices ) else 'NOT AVAILABLE' }}
+______________________________________

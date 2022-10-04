@@ -1,0 +1,52 @@
+---
+- name: setup repository server
+  hosts: localhost
+  become: true
+  gather_facts: no
+
+  tasks:
+
+  - name: install vsftpd
+    yum:
+      name: vsftpd
+      state: latest
+    notify: enable vsftpd
+    changed_when: true
+
+  - name: configure firewalld
+    firewalld:
+      service: ftp
+      state: enabled
+      permanent: true
+      immediate: true
+
+  - name: configure anonymous user access
+    lineinfile:
+      path: /etc/vsftpd/vsftpd.conf
+      regexp: '^anonymous_enable.*$'
+      line: 'anonymous_enable=YES'
+      state: present
+
+  - name: config selinux boolean for ftp access
+    command: setsebool -P ftpd_full_access on
+
+  - name: create repo dir
+    file:
+      path: /var/ftp/pub/repo
+      state: directory
+
+  - name: mount local repo
+    mount:
+      path: /var/ftp/pub/repo
+      src: /dev/sr0
+      state: mounted
+      fstype: iso9660
+      opts: defaults
+
+  handlers:
+
+  - name: enable vsftpd
+    service:
+      name: vsftpd
+      state: restarted
+      enabled: true

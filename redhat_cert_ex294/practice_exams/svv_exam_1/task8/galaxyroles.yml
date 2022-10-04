@@ -1,0 +1,30 @@
+---
+- name: install galaxy roles
+  hosts: ansible4.example.com
+
+  pre_tasks:
+
+  - name: install requirements
+    shell: "ansible-galaxy install -r roles/requirements.yml -p roles"
+    delegate_to: localhost
+    run_once: true
+
+  roles:
+    - geerlingguy.redis
+    - geerlingguy.nginx
+
+  tasks:
+
+    - name: configure firewall ports for redis
+      firewalld:
+        port: 6379/tcp
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: configure firewall services for nginx
+      firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true

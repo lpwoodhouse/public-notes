@@ -1,0 +1,23 @@
+---
+- name: configure high-availability proxy server
+  hosts: proxy
+  become: true
+
+  vars:
+    haproxy_backend_servers:
+      - name: ansible4.hl.local
+        address: 10.0.0.183:80
+      - name: ansible3.hl.local
+        address: 10.0.0.182:80
+
+  pre_tasks:
+
+    - name: configure firewall
+      firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+
+  roles:
+    - geerlingguy.haproxy

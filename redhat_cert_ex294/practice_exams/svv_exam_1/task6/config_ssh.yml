@@ -1,0 +1,36 @@
+---
+- name: configure ssh on managed servers
+  hosts: all
+  vars:
+    sshport: 2022
+    allowusers: 'ansible, root'
+    permitroot: yes
+
+  pre_tasks:
+  - name: ensure SELinux enforcing
+    selinux:
+      policy: targeted
+      state: enforcing
+
+  roles:
+  - role: configssh
+    when: ansible_facts['os_family'] == 'RedHat'
+
+  tasks:
+  - name: configure firewalld
+    firewalld:
+      port: "{{ sshport }}/tcp"
+      state: enabled
+      permanent: true
+      immediate: true
+  - name: restart firewalld
+    service:
+      name: firewalld
+      state: restarted
+      enabled: true
+  - name: allow sshd to listen on tcp port {{ sshport }}
+    seport:
+      ports: "{{ sshport }}"
+      proto: tcp
+      setype: ssh_port_t
+      state: present

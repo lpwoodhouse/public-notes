@@ -1,0 +1,36 @@
+---
+- name: create primary partition on /dev/sdb
+  parted:
+    device: /dev/sdb
+    number: 1
+    part_end: 800MB
+    state: present
+
+- name: create vg
+  lvg:
+    vg: vg_database
+    pvs: /dev/sdb1
+
+- name: create lv
+  lvol:
+    vg: vg_database
+    lv: lv_mysql
+    size: 512M
+
+- name: create filesystem
+  filesystem:
+    dev: /dev/vg_database/lv_mysql
+    fstype: xfs
+
+- name: create mount dir
+  file:
+    path: /mnt/mysql_backups
+    state: directory
+
+- name: mount volume
+  mount:
+    path: /mnt/mysql_backups
+    src: /dev/vg_database/lv_mysql
+    fstype: xfs
+    opts: defaults
+    state: mounted

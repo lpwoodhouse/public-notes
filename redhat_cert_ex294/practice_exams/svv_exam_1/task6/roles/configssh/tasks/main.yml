@@ -1,0 +1,12 @@
+---
+# tasks file for configssh
+
+- name: replace sshd_config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    backup: yes
+    user: root
+    group: root
+    mode: 0600
+  notify: restart sshd

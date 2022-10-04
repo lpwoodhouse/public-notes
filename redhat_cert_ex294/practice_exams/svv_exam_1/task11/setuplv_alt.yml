@@ -1,0 +1,29 @@
+---
+- name: set up logical volumes on hosts
+  hosts: all
+
+  vars:
+    lvname: lvdata
+    vgname: vgdata
+    lvsize: 2000M
+
+  tasks:
+
+  - name: create logical volume
+    lvol:
+      lv: "{{ lvname }}"
+      vg: "{{ vgname }}"
+      size: "{{ lvsize }}"
+    ignore_errors: true
+    register: lvresult
+    when: ansible_facts['devices']['sdb'] is defined
+  
+  - name: vg not defined error
+    fail:
+      msg: vgdata does not exist
+    when: "'not found' in lvresult.err"
+  
+  - name: insufficient space error
+    fail:
+      msg: insufficient space
+    when: "'insufficient' in lvresult.err"

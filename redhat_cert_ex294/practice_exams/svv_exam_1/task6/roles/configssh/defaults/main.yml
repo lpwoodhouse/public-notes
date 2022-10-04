@@ -1,0 +1,6 @@
+---
+# defaults file for configssh
+
+allowusers: root
+sshport: 22
+permitroot: yes

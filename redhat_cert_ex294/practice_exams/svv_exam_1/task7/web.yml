@@ -1,0 +1,15 @@
+---
+- name: setup webservers and clients
+  hosts: all
+
+  tasks:
+
+  - include_tasks: tasks/webserver_setup.yml
+    when: ansible_host in groups['webservers']
+
+  - include_tasks: tasks/webclient_setup.yml
+    when: ansible_host in groups['webclients']
+
+  handlers:
+
+  - import_tasks: handlers/main.yml

@@ -1,0 +1,51 @@
+---
+- name: genertate sysreport template file
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+
+  - name: create hwtemplate.txt
+    copy:
+      dest: ./hwtemplate.txt
+      content: |
+        NAME=
+        IPADDRESS=
+        TOTAL_MEMORY=
+        NIC_NAME=
+        SECOND_NIC_NAME=
+
+- name: copy sysreport to managed servers
+  hosts: all
+  gather_facts: yes
+  vars:
+    ens_ifaces: []
+
+  tasks:
+
+  - name: copy template to host
+    copy:
+      src: ./hwtemplate.txt
+      dest: /root/report.txt
+
+  - set_fact:
+      ens_ifaces: "{{ens_ifaces + [item]}}"
+    loop: "{{ansible_interfaces}}"
+    when: "'ens' in item"
+
+  - set_fact:
+      ens_temp: "{{ens_ifaces|sort}}"
+  - set_fact:
+      ens_second: "{{ens_temp[1] if (ens_temp|length > 1) else 'NONE'}}"
+
+  - name: config report
+    replace:
+      path: /root/report.txt
+      regexp: '{{ item.regex }}'
+      replace: '\1 {{ item.value }}'
+    loop:
+      - { regex: '(^NAME.+$)', value: '{{ ansible_hostname }}' }
+      - { regex: '(^IP.+$)', value: '{{ ansible_default_ipv4.address }}' }
+      - { regex: '(^TOTAL.+$)', value: '{{ ansible_memtotal_mb}}MB' }
+      - { regex: '(^NIC.+$)', value: '{{ ens_temp[0] }}' }
+      - { regex: '(^SECOND.+$)', value: '{{ ens_second }}' }

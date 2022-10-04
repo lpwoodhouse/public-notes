@@ -1,0 +1,20 @@
+---
+- name: archiving task
+  hosts: database
+  become: true
+  vars:
+    path: /mnt/mysql_backups/
+    file: database_list.txt
+
+  tasks:
+
+  - name: create list.txt
+    copy:
+      dest: "{{ path }}{{ file }}"
+      content: 'dev,test,qa,prod'
+
+  - name: create archive
+    archive:
+      path: "{{ path }}{{ file }}"
+      dest: "{{ path }}archive.gz"
+      format: gz

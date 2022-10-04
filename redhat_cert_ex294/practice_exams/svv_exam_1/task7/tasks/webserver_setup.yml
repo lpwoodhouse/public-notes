@@ -1,0 +1,33 @@
+---
+  - name: install package
+    yum:
+      name: "{{ web_package }}"
+      state: present
+
+  - name: copy vhost config template
+    template:
+      src: web/templates/vhost.conf.j2
+      dest: /etc/httpd/conf.d/vhost.conf
+
+  - name: start web service
+    service:
+      name: "{{ web_service }}"
+      state: started
+      enabled: true
+
+  - name: allow web service through firewall
+    firewalld:
+      service: "{{ firewall_service }}"
+      state: enabled
+      permanent: true
+      immediate: true
+
+  - name: copy {{ web_config_file }} template
+    template:
+      src: web/templates/httpd.conf.j2
+      dest: "{{ web_config_file }}"
+      owner: root
+      group: root
+      mode: 0644
+      setype: httpd_config_t
+    notify: restart httpd

@@ -1,0 +1,7 @@
+---
+- name: install mysql database
+  hosts: database
+  become: true
+
+  roles:
+    - sample-mysql

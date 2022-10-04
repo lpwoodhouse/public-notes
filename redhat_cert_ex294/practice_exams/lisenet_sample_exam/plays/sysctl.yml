@@ -1,0 +1,17 @@
+---
+- name: Config RAM optimization
+  hosts: all
+  become: yes
+
+  tasks:
+
+  - name: config sysctl
+    lineinfile:
+      path: /etc/sysctl.conf
+      line: 'vm.sappiness = 10'
+    when: ansible_memtotal_mb > 2048
+
+  - name: err message
+    debug:
+      msg: Server memory less than 2048MB
+    when: ansible_memtotal_mb < 2048

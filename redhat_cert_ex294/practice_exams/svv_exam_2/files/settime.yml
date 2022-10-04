@@ -1,0 +1,30 @@
+---
+- name: configure network time
+  hosts: all
+  vars:
+    timesync_ntp_servers:
+      - hostname: 10.0.0.50
+        pool: no
+        iburst: yes
+
+  roles:
+    - rhel-system-roles.timesync
+
+  tasks:
+
+  - name: ensure chronyd enabled and restarted
+    service:
+      name: chronyd
+      state: restarted
+      enabled: true
+
+  - name: verify time sync
+    shell: timedatectl
+    register: datetime
+
+  - debug:
+      msg: "{{ datetime.stdout_lines[4] }}"
+      verbosity: 1
+
+  - debug:
+      msg: "{{'Time is synchronized' if ('yes' in datetime.stdout_lines[4]) else 'Unfortunately time could not be synchronized'}}"
