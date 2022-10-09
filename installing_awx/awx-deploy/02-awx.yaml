@@ -1,0 +1,16 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+
+  admin_user: admin
+  admin_password_secret: awx-admin-password
+
+  service_type: nodeport
+  ingress_type: none
+  hostname: awx.example.com     # Replace fqdn.awx.host.com with Host FQDN and DO NOT use IP.
+  
+  postgres_configuration_secret: awx-postgres-configuration
