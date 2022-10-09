@@ -9,7 +9,7 @@ stringData:
   port: "5432"
   database: awx
   username: awx
-  password: <awxdatabaseadmin> # Replace to set the database you wish to used
+  password: <awxdatabaseadmin>    # Set the database password you wish to use.
   type: managed
 type: Opaque
 
@@ -20,7 +20,7 @@ metadata:
   name: awx-admin-password
   namespace: awx
 stringData:
-  password: <awxadmin> # Replace to set the default Admin password for awx
+  password: <awxadmin>    # Set the default Admin password for awx.
 type: Opaque
 
 ---
